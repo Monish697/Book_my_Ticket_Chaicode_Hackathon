@@ -1,19 +1,5 @@
 import { getPool } from "../../common/utils/db.config.js";
 
-const getAllSeat = async () => {
-    const pool = getPool();
-    const client = await pool.connect();
-    try {
-        const result = await client.query("select * from seats");
-        return result.rows;
-    } catch (error) {
-        console.error(error);
-        throw error;
-    } finally {
-        client.release();
-    }
-};
-
 const BookSeat = async (seatId, userName) => {
     const pool = getPool();
     const client = await pool.connect();
@@ -46,4 +32,4 @@ const BookSeat = async (seatId, userName) => {
     }
 };
 
-export { getAllSeat, BookSeat };
+export { BookSeat };
