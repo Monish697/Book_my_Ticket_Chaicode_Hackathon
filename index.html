@@ -90,7 +90,7 @@
                     const baseClasses =
                         "w-32 h-32 rounded-2xl text-center align-middle text-2xl font-bold transition-all duration-300 select-none relative group";
 
-                    if (j[i].isbooked) {
+                    if (j[i].is_booked) {
                         td.className = `${baseClasses} bg-rose-500/10 text-rose-500/60 border border-rose-500/20 cursor-not-allowed`;
                         td.innerHTML = `
                     <span class="relative z-10">${j[i].id}</span>
@@ -122,11 +122,11 @@
                             }
 
                             const id = j[i].id;
-                            const name = prompt("Enter your name");
-                            if (!name) return;
-
-                            const res = await fetch(`/seat/${id}/${name}`, {
+                            const res = await fetch(`/seat/${id}`, {
                                 method: "PUT",
+                                headers: {
+                                    Authorization: `Bearer ${token}`,
+                                },
                             });
                             const data = await res.json();
 
@@ -136,6 +136,7 @@
                                     data.error,
                                 );
                             } else {
+                                const name = data.name || "You";
                                 alert("Booked successfully!");
                                 currentTd.className = `${baseClasses} bg-rose-500/10 text-rose-500/60 border border-rose-500/20 cursor-not-allowed`;
                                 currentTd.innerHTML = `

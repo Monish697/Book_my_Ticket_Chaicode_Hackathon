@@ -1,17 +1,16 @@
-import ApiError from "../../common/utils/api-error.js";
-
 import { getPool } from "../../common/utils/db.config.js";
+import { verifyAccessToken } from "../../common/utils/jwt.utils.js";
 
 const authenticate = async (req, res, next) => {
-    const name = req.params.name;
-    const id = req.params.id;
-    const token = req.cookies.token;
     const pool = getPool();
     const client = await pool.connect();
     try {
-        const requestedName = req.params.name;
-
-        const token = req.cookies.token;
+        const authHeader = req.headers.authorization || req.headers.Authorization;
+        const bearerToken =
+            typeof authHeader === "string" && authHeader.startsWith("Bearer ")
+                ? authHeader.slice("Bearer ".length).trim()
+                : null;
+        const token = bearerToken || req.cookies?.token;
 
         if (!token) {
             return res
@@ -19,30 +18,30 @@ const authenticate = async (req, res, next) => {
                 .json({ error: "Unauthorized: Please log in to book a seat." });
         }
 
-        const decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET);
+        const decoded = verifyAccessToken(token);
 
         const userId = decoded.id;
 
-        const pool = getPool();
-
         const userQuery = `
             SELECT * FROM users 
-            WHERE id = $1 AND "first name" = $2;
+            WHERE id = $1;
         `;
-        const result = await pool.query(userQuery, [userId, requestedName]);
+        const result = await client.query(userQuery, [userId]);
 
         if (result.rows.length === 0) {
-            return res.status(403).json({
-                error: "Forbidden: The name provided does not match the logged-in user.",
-            });
+            return res.status(401).json({ error: "Unauthorized: User not found." });
         }
 
-        req.user = result.rows[0];
+        const row = result.rows[0];
+        req.user = {
+            id: row.id,
+            firstName: row["first name"],
+            lastName: row.last_name,
+            email: row.email,
+        };
         next();
     } catch (error) {
-        res.status(401).json({
-            error,
-        });
+        res.status(401).json({ error: "Unauthorized: Invalid or expired token." });
     } finally {
         client.release();
     }

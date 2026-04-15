@@ -13,8 +13,13 @@ import cookieParser from "cookie-parser";
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const port = process.env.PORT || 8080;
-const app = new express();
-app.use(cors());
+const app = express();
+app.use(
+    cors({
+        origin: process.env.CORS_ORIGIN || true,
+        credentials: true,
+    }),
+);
 app.use(express.json());
 app.use(cookieParser());
 app.get("/", (req, res) => {

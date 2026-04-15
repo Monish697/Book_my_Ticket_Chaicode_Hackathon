@@ -7,10 +7,11 @@ const getAllSeat = async (req, res) => {
 };
 const BookSeat = async (req, res) => {
     const seatId = req.params.id;
-    const userName = req.user.name || req.params.name;
+    const userName =
+        req.user?.firstName || req.params.name || req.body?.name || "Anonymous";
 
     const bookingServiceRes = await bookingService.BookSeat(seatId, userName);
 
-    res.send(bookingServiceRes);
+    res.send({ ...bookingServiceRes, seatId, name: userName });
 };
 export { getAllSeat, BookSeat };
