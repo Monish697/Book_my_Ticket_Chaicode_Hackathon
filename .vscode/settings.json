@@ -1,0 +1,19 @@
+{
+    "sqltools.connections": [
+        {
+            "pgOptions": {
+                "max": 20,
+                "connectionTimeoutMillis": 0,
+                "idleTimeoutMillis": 0
+            },
+            "ssh": "Disabled",
+            "previewLimit": 50,
+            "server": "localhost",
+            "port": 5432,
+            "driver": "PostgreSQL",
+            "name": "postgres_conn",
+            "database": "sql_db_hackathon",
+            "username": "postgres"
+        }
+    ]
+}
